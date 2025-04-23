@@ -3,6 +3,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { CustomInput } from "./CustomInput";
 import { toast } from "react-toastify";
+import { postUser } from "../../helpers/axiosHelper";
 export const SignUpForm = () => {
   const fields = [
     {
@@ -42,13 +43,14 @@ export const SignUpForm = () => {
       [name]: value,
     });
   };
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
     const { confirmPassword, ...rest } = form;
     if (confirmPassword !== rest.password) {
-      console.log(confirmPassword);
       return toast.error("Passwords don't match", { theme: "dark" });
     }
+    const { status, message } = await postUser(rest);
+    toast[status](message);
   };
   return (
     <div className="border rounded p-4">
