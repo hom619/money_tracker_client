@@ -3,3 +3,6 @@
   background: black;
   color: #e4e3e3f0;
 }
+.main {
+  min-height: calc(100vh - 150px);
+}

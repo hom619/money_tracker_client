@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { TbPigMoney } from "react-icons/tb";
 const financialTips = [
   {
     expert: "Warren Buffett",
@@ -74,6 +75,14 @@ export const FinancialTips = () => {
       className="d-flex flex-column justify-content-center"
       style={{ height: "100%" }}
     >
+      <div className="mb-3">
+        <TbPigMoney className="text-success" style={{ fontSize: "20rem" }} />
+        {/* <GiReceiveMoney
+          className="text-success"
+          style={{ fontSize: "10rem" }}
+        /> */}
+        {/* <GiMoneyStack className="text-success" style={{ fontSize: "20rem" }} /> */}
+      </div>
       <h4>{tip}</h4>
       <div className="fw-bolder">
         "{quote}" - {expert}
