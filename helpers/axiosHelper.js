@@ -24,3 +24,13 @@ export const postUser = (data) => {
   };
   return apiProcessor(obj);
 };
+
+//login
+export const loginUser = (data) => {
+  const obj = {
+    method: "post",
+    url: rootAPIEndpoint + "/users/login",
+    data,
+  };
+  return apiProcessor(obj);
+};

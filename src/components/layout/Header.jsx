@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { ImExit } from "react-icons/im";
 import { TbLogin } from "react-icons/tb";
 import { IoCreate } from "react-icons/io5";
+import { BiSolidDashboard } from "react-icons/bi";
+import { TbTransactionDollar } from "react-icons/tb";
 
 export const Header = () => {
   return (
@@ -22,6 +24,15 @@ export const Header = () => {
               <IoCreate />
               Sign up
             </Link>
+            <Link className="nav-link" to="/dashboard">
+              <BiSolidDashboard />
+              Dashboard
+            </Link>
+            <Link className="nav-link" to="/transactions">
+              <TbTransactionDollar />
+              Transactions
+            </Link>
+
             <Link className="nav-link" to="/signup">
               <ImExit />
               Logout

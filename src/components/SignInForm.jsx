@@ -2,6 +2,8 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { CustomInput } from "./CustomInput";
 import { useForm } from "../hooks/useForm";
+import { toast } from "react-toastify";
+import { loginUser } from "../../helpers/axiosHelper";
 
 export const SignInForm = () => {
   const initialState = {
@@ -25,17 +27,15 @@ export const SignInForm = () => {
     },
   ];
   const { form, setForm, handleOnChange } = useForm(initialState);
-  //   const [form, setForm] = useState({});
-  //   const handleOnChange = (e) => {
-  //     const { name, value } = e.target;
-  //     setForm({
-  //       ...form,
-  //       [name]: value,
-  //     });
-  //   };
+
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
+    const { email, password } = form;
+    if (!email || !password) {
+      return toast.error("Please fill in all fields", { theme: "dark" });
+    }
+    const { status, message, user, accessJWT } = await loginUser(form);
+    toast[status](message);
   };
   return (
     <div className="border rounded p-4">
