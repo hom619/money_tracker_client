@@ -4,8 +4,13 @@ import { CustomInput } from "./CustomInput";
 import { useForm } from "../hooks/useForm";
 import { toast } from "react-toastify";
 import { loginUser } from "../../helpers/axiosHelper";
+import { useUser } from "../context/UserContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const SignInForm = () => {
+  const navigate = useNavigate();
+  const { user, setUser } = useUser();
   const initialState = {
     email: "",
     password: "",
@@ -27,15 +32,22 @@ export const SignInForm = () => {
     },
   ];
   const { form, setForm, handleOnChange } = useForm(initialState);
-
+  useEffect(() => {
+    user?._id && navigate("/dashboard");
+  }, [user?._id, navigate]);
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = form;
     if (!email || !password) {
       return toast.error("Please fill in all fields", { theme: "dark" });
     }
-    const { status, message, user, accessJWT } = await loginUser(form);
+    const pendingResponse = loginUser(form);
+    toast.promise(pendingResponse, {
+      pending: "Please wait...",
+    });
+    const { status, message, user, accessJWT } = await pendingResponse;
     toast[status](message);
+    setUser(user);
   };
   return (
     <div className="border rounded p-4">
