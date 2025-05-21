@@ -8,8 +8,16 @@ import { TbLogin } from "react-icons/tb";
 import { IoCreate } from "react-icons/io5";
 import { BiSolidDashboard } from "react-icons/bi";
 import { TbTransactionDollar } from "react-icons/tb";
+import { useUser } from "../../context/UserContext";
 
 export const Header = () => {
+  const { user, setUser } = useUser();
+  const handleOnLogOut = () => {
+    //remove the access token from the local storage
+    localStorage.removeItem("accessJWT");
+    setUser({});
+    //redirect to the login page
+  };
   return (
     <Navbar expand="lg" variant="dark" className="bg-body-dark">
       <Container>
@@ -17,26 +25,37 @@ export const Header = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Link className="nav-link" to="/">
-              <TbLogin /> Login
-            </Link>
-            <Link className="nav-link" to="/signup">
-              <IoCreate />
-              Sign up
-            </Link>
-            <Link className="nav-link" to="/dashboard">
-              <BiSolidDashboard />
-              Dashboard
-            </Link>
-            <Link className="nav-link" to="/transactions">
-              <TbTransactionDollar />
-              Transactions
-            </Link>
+            {user?._id ? (
+              <>
+                <Link className="nav-link" to="/dashboard">
+                  <BiSolidDashboard />
+                  Dashboard
+                </Link>
+                <Link className="nav-link" to="/transactions">
+                  <TbTransactionDollar />
+                  Transactions
+                </Link>
 
-            <Link className="nav-link" to="/signup">
-              <ImExit />
-              Logout
-            </Link>
+                <Link
+                  onClick={handleOnLogOut}
+                  className="nav-link"
+                  to="/signup"
+                >
+                  <ImExit />
+                  Logout
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link className="nav-link" to="/">
+                  <TbLogin /> Login
+                </Link>
+                <Link className="nav-link" to="/signup">
+                  <IoCreate />
+                  Sign up
+                </Link>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

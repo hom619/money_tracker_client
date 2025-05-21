@@ -48,6 +48,7 @@ export const SignInForm = () => {
     const { status, message, user, accessJWT } = await pendingResponse;
     toast[status](message);
     setUser(user);
+    localStorage.setItem("accessJWT", accessJWT);
   };
   return (
     <div className="border rounded p-4">

@@ -1,11 +1,16 @@
 import axios from "axios";
 const rootAPIEndpoint = "http://localhost:8000/api/v1";
-const apiProcessor = async ({ method, url, data }) => {
+const getToken = () => {
+  return localStorage.getItem("accessJWT");
+};
+
+const apiProcessor = async ({ method, url, data, headers }) => {
   try {
     const response = await axios({
       method,
       url,
       data,
+      headers,
     });
     return response.data;
   } catch (error) {
@@ -24,7 +29,17 @@ export const postUser = (data) => {
   };
   return apiProcessor(obj);
 };
-
+//get user
+export const getUser = () => {
+  const obj = {
+    method: "get",
+    url: rootAPIEndpoint + "/users/",
+    headers: {
+      Authorization: getToken(),
+    },
+  };
+  return apiProcessor(obj);
+};
 //login
 export const loginUser = (data) => {
   const obj = {
