@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { loginUser } from "../../helpers/axiosHelper";
 import { useUser } from "../context/UserContext";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const SignInForm = () => {
   const navigate = useNavigate();
@@ -31,10 +31,11 @@ export const SignInForm = () => {
       name: "password",
     },
   ];
-  const { form, setForm, handleOnChange } = useForm(initialState);
+  const { form, handleOnChange } = useForm(initialState);
+  const goToLocation = useLocation().state?.from?.pathname || "/dashboard";
   useEffect(() => {
-    user?._id && navigate("/dashboard");
-  }, [user?._id, navigate]);
+    user?._id && navigate(goToLocation);
+  }, [user?._id, navigate, goToLocation]);
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = form;
