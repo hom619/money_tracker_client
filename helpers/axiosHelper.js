@@ -49,3 +49,17 @@ export const loginUser = (data) => {
   };
   return apiProcessor(obj);
 };
+
+//post new transaction
+export const postTransaction = (data) => {
+  const obj = {
+    method: "post",
+    url: rootAPIEndpoint + "/transactions",
+    data,
+    headers: {
+      Authorization: getToken(),
+    },
+  };
+
+  return apiProcessor(obj);
+};

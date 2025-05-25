@@ -3,7 +3,8 @@ import Button from "react-bootstrap/Button";
 import { useForm } from "../hooks/useForm";
 import { CustomInput } from "./CustomInput";
 import Form from "react-bootstrap/Form";
-
+import { postTransaction } from "../../helpers/axiosHelper";
+import { toast } from "react-toastify";
 export const TransactionForm = () => {
   const initialState = {
     type: "",
@@ -37,9 +38,15 @@ export const TransactionForm = () => {
       value: form.tranDate,
     },
   ];
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
+    const pendingResponse = postTransaction(form);
+    toast.promise(pendingResponse, {
+      pending: "Please wait...",
+    });
+    const { status, message } = await pendingResponse;
+    toast[status](message, { theme: "dark" });
+    status === "success" && setForm(initialState); // Reset form on success
   };
   return (
     <div className="border rounded p-4">
