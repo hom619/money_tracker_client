@@ -5,7 +5,9 @@ import { CustomInput } from "./CustomInput";
 import Form from "react-bootstrap/Form";
 import { postTransaction } from "../../helpers/axiosHelper";
 import { toast } from "react-toastify";
+import { useUser } from "../context/UserContext";
 export const TransactionForm = () => {
+  const { getTransactions } = useUser();
   const initialState = {
     type: "",
     title: "",
@@ -46,7 +48,10 @@ export const TransactionForm = () => {
     });
     const { status, message } = await pendingResponse;
     toast[status](message, { theme: "dark" });
-    status === "success" && setForm(initialState); // Reset form on success
+    if (status === "success") {
+      setForm(initialState);
+      getTransactions();
+    } // Reset form on success
   };
   return (
     <div className="border rounded p-4">

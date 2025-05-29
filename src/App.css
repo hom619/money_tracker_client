@@ -6,3 +6,9 @@
 .main {
   min-height: calc(100vh - 150px);
 }
+.expense {
+  color: rgb(239, 89, 89) !important;
+}
+.income {
+  color: rgb(17, 205, 120) !important;
+}

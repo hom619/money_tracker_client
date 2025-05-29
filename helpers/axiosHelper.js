@@ -50,6 +50,8 @@ export const loginUser = (data) => {
   return apiProcessor(obj);
 };
 
+// ### Transactions API
+
 //post new transaction
 export const postTransaction = (data) => {
   const obj = {
@@ -61,5 +63,17 @@ export const postTransaction = (data) => {
     },
   };
 
+  return apiProcessor(obj);
+};
+
+//get all transactions
+export const getTransactions = () => {
+  const obj = {
+    method: "get",
+    url: rootAPIEndpoint + "/transactions",
+    headers: {
+      Authorization: getToken(),
+    },
+  };
   return apiProcessor(obj);
 };
