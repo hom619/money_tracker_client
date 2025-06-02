@@ -7,7 +7,7 @@ import { MdAssignmentAdd } from "react-icons/md";
 
 export const TransactionTable = () => {
   const [displayTransactions, setDisplayTransactions] = useState([]);
-  const { transactions } = useUser();
+  const { transactions, toggleModal } = useUser();
   useEffect(() => {
     setDisplayTransactions(transactions);
   }, [transactions]);
@@ -46,7 +46,7 @@ export const TransactionTable = () => {
             />
           </div>
           <div>
-            <MdAssignmentAdd />
+            <MdAssignmentAdd onClick={() => toggleModal(true)} />
           </div>
         </div>
         <Table hover>

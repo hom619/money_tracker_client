@@ -7,7 +7,7 @@ import { postTransaction } from "../../helpers/axiosHelper";
 import { toast } from "react-toastify";
 import { useUser } from "../context/UserContext";
 export const TransactionForm = () => {
-  const { getTransactions } = useUser();
+  const { getAllTransactions, toggleModal } = useUser();
   const initialState = {
     type: "",
     title: "",
@@ -50,8 +50,11 @@ export const TransactionForm = () => {
     toast[status](message, { theme: "dark" });
     if (status === "success") {
       setForm(initialState);
-      getTransactions();
-    } // Reset form on success
+      // Reset form on success
+      getAllTransactions();
+      //close modal
+      toggleModal(false);
+    }
   };
   return (
     <div className="border rounded p-4">

@@ -8,9 +8,19 @@ export const UserProvider = ({ children }) => {
     const { status, transactions } = await getTransactions();
     status === "success" && setTransactions(transactions);
   };
+  const [show, setShow] = useState(false);
+
+  const toggleModal = (value) => setShow(value);
   return (
     <UserContext.Provider
-      value={{ user, setUser, getAllTransactions, transactions }}
+      value={{
+        user,
+        setUser,
+        getAllTransactions,
+        transactions,
+        toggleModal,
+        show,
+      }}
     >
       {children}
     </UserContext.Provider>
