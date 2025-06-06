@@ -4,10 +4,12 @@ import moment from "moment";
 import { useUser } from "../context/UserContext";
 import Form from "react-bootstrap/Form";
 import { MdAssignmentAdd } from "react-icons/md";
+import Button from "react-bootstrap/esm/Button";
 
 export const TransactionTable = () => {
   const [displayTransactions, setDisplayTransactions] = useState([]);
   const { transactions, toggleModal } = useUser();
+  const [idsToDelete, setIdsToDelete] = useState([]);
   useEffect(() => {
     setDisplayTransactions(transactions);
   }, [transactions]);
@@ -20,6 +22,22 @@ export const TransactionTable = () => {
     // Update the transactions state with the filtered results
     // Assuming you have a method to set transactions in your context
     // setTransactions(filteredTransactions);
+  };
+  const handleOnSelect = (e) => {
+    const { checked, value } = e.target;
+    if (value === "all") {
+      checked
+        ? setIdsToDelete(displayTransactions.map((item) => item._id))
+        : setIdsToDelete([]);
+      return;
+    }
+    if (checked) {
+      setIdsToDelete([...idsToDelete, value]);
+    } else {
+      setIdsToDelete(idsToDelete.filter((id) => id !== value));
+    }
+
+    return;
   };
   return (
     <>
@@ -49,10 +67,17 @@ export const TransactionTable = () => {
             <MdAssignmentAdd onClick={() => toggleModal(true)} />
           </div>
         </div>
+        <div>
+          <Form.Check
+            label="Select All"
+            value="all"
+            onChange={handleOnSelect}
+            checked={idsToDelete.length === displayTransactions.length}
+          />
+        </div>
         <Table hover>
           <thead>
             <tr>
-              <th>#</th>
               <th>Date</th>
               <th>Transaction Description</th>
               <th>Expense</th>
@@ -61,10 +86,14 @@ export const TransactionTable = () => {
           </thead>
           <tbody>
             {displayTransactions.length > 0 &&
-              displayTransactions.map((transaction, index) => (
+              displayTransactions.map((transaction) => (
                 <tr key={transaction._id}>
-                  <td>{index + 1}</td>
-                  <td>{moment(transaction.tranDate).format("MMMM D, Y")}</td>
+                  <Form.Check
+                    label={moment(transaction.tranDate).format("MMMM D, Y")}
+                    value={transaction._id}
+                    onChange={handleOnSelect}
+                    checked={idsToDelete.includes(transaction._id)}
+                  />
                   <td>{transaction.title}</td>
                   <td className="expense">
                     {transaction.type === "expense"
@@ -106,6 +135,13 @@ export const TransactionTable = () => {
             </tr>
           </tbody>
         </Table>
+        {idsToDelete.length > 0 && (
+          <div className="d-grid">
+            <Button variant="danger">
+              Delete {idsToDelete.length} Transaction(s)
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );
