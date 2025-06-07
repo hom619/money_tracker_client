@@ -77,3 +77,16 @@ export const getTransactions = () => {
   };
   return apiProcessor(obj);
 };
+
+// Delete transactions
+export const deleteTransactions = (data) => {
+  const obj = {
+    method: "delete",
+    url: rootAPIEndpoint + "/transactions",
+    data,
+    headers: {
+      Authorization: getToken(),
+    },
+  };
+  return apiProcessor(obj);
+};

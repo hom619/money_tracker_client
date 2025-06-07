@@ -1,14 +1,16 @@
-import { React, useEffect, useState } from "react";
+import { React, use, useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import moment from "moment";
 import { useUser } from "../context/UserContext";
 import Form from "react-bootstrap/Form";
 import { MdAssignmentAdd } from "react-icons/md";
 import Button from "react-bootstrap/esm/Button";
+import { deleteTransactions } from "../../helpers/axiosHelper";
+import { toast } from "react-toastify";
 
 export const TransactionTable = () => {
   const [displayTransactions, setDisplayTransactions] = useState([]);
-  const { transactions, toggleModal } = useUser();
+  const { transactions, toggleModal, getAllTransactions } = useUser();
   const [idsToDelete, setIdsToDelete] = useState([]);
   useEffect(() => {
     setDisplayTransactions(transactions);
@@ -22,6 +24,23 @@ export const TransactionTable = () => {
     // Update the transactions state with the filtered results
     // Assuming you have a method to set transactions in your context
     // setTransactions(filteredTransactions);
+  };
+  const handleOnDelete = async () => {
+    if (
+      confirm(
+        `Are you sure you want to delete ${idsToDelete.length} transaction(s)?`
+      )
+    ) {
+      const pendingResponse = deleteTransactions(idsToDelete);
+      toast.promise(pendingResponse, {
+        pending: "Please wait...",
+      });
+      const { status, message } = await pendingResponse;
+      toast[status](message);
+      status === "success" && getAllTransactions();
+      // Reset the idsToDelete state after deletion
+      setIdsToDelete([]);
+    }
   };
   const handleOnSelect = (e) => {
     const { checked, value } = e.target;
@@ -108,7 +127,7 @@ export const TransactionTable = () => {
                 </tr>
               ))}
             <tr className="fw-bold text-start">
-              <td colSpan={3}>Total</td>
+              <td colSpan={2}>Total</td>
               <td>
                 $
                 {displayTransactions
@@ -137,7 +156,7 @@ export const TransactionTable = () => {
         </Table>
         {idsToDelete.length > 0 && (
           <div className="d-grid">
-            <Button variant="danger">
+            <Button variant="danger" onClick={handleOnDelete}>
               Delete {idsToDelete.length} Transaction(s)
             </Button>
           </div>
