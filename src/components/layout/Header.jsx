@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -12,26 +12,44 @@ import { useUser } from "../../context/UserContext";
 
 export const Header = () => {
   const { user, setUser } = useUser();
+  const [expandMenu, setExpandMenu] = useState(false);
   const handleOnLogOut = () => {
     //remove the access token from the local storage
     localStorage.removeItem("accessJWT");
     setUser({});
     //redirect to the login page
+    setExpandMenu(false);
   };
   return (
-    <Navbar expand="lg" variant="dark" className="bg-body-dark">
+    <Navbar
+      expand="lg"
+      variant="dark"
+      className="bg-body-dark"
+      expanded={expandMenu}
+    >
       <Container>
         <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle
+          aria-controls="basic-navbar-nav"
+          onClick={() => setExpandMenu(true)}
+        />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             {user?._id ? (
               <>
-                <Link className="nav-link" to="/dashboard">
+                <Link
+                  className="nav-link"
+                  to="/dashboard"
+                  onClick={() => setExpandMenu(false)}
+                >
                   <BiSolidDashboard />
                   Dashboard
                 </Link>
-                <Link className="nav-link" to="/transactions">
+                <Link
+                  className="nav-link"
+                  to="/transactions"
+                  onClick={() => setExpandMenu(false)}
+                >
                   <TbTransactionDollar />
                   Transactions
                 </Link>
@@ -47,10 +65,18 @@ export const Header = () => {
               </>
             ) : (
               <>
-                <Link className="nav-link" to="/">
+                <Link
+                  className="nav-link"
+                  to="/"
+                  onClick={() => setExpandMenu(false)}
+                >
                   <TbLogin /> Login
                 </Link>
-                <Link className="nav-link" to="/signup">
+                <Link
+                  className="nav-link"
+                  to="/signup"
+                  onClick={() => setExpandMenu(false)}
+                >
                   <IoCreate />
                   Sign up
                 </Link>

@@ -5,7 +5,6 @@ import Modal from "react-bootstrap/Modal";
 
 export const CustomModal = ({ children }) => {
   const { toggleModal, show } = useUser();
-
   return (
     <>
       <Modal

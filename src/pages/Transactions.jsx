@@ -20,7 +20,6 @@ export const Transactions = () => {
           <CustomModal>
             <TransactionForm />
           </CustomModal>
-
           <hr></hr>
           <TransactionTable />
         </Col>

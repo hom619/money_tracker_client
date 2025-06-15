@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import { Signup } from "./pages/Signup";
-import { MainLayout } from "./components/layout/mainLayout";
+import { MainLayout } from "./components/layout/MainLayout.jsx";
 import { Dashboard } from "./pages/Dashboard";
 import { Transactions } from "./pages/Transactions";
 import { Auth } from "./auth/Auth";

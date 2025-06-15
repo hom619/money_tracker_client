@@ -1,5 +1,6 @@
 import axios from "axios";
-const rootAPIEndpoint = "http://localhost:8000/api/v1";
+const rootAPIEndpoint = import.meta.env.VITE_ROOT_URL + "/api/v1";
+console.log("API Endpoint: ", rootAPIEndpoint);
 const getToken = () => {
   return localStorage.getItem("accessJWT");
 };
@@ -71,6 +72,19 @@ export const getTransactions = () => {
   const obj = {
     method: "get",
     url: rootAPIEndpoint + "/transactions",
+    headers: {
+      Authorization: getToken(),
+    },
+  };
+  return apiProcessor(obj);
+};
+
+// Update transactions
+export const updateTransaction = (data) => {
+  const obj = {
+    method: "patch",
+    url: rootAPIEndpoint + "/transactions",
+    data,
     headers: {
       Authorization: getToken(),
     },

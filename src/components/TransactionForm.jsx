@@ -1,20 +1,51 @@
-import React from "react";
+import { React, useEffect } from "react";
+
 import Button from "react-bootstrap/Button";
 import { useForm } from "../hooks/useForm";
 import { CustomInput } from "./CustomInput";
 import Form from "react-bootstrap/Form";
-import { postTransaction } from "../../helpers/axiosHelper";
+import { postTransaction, updateTransaction } from "../../helpers/axiosHelper";
 import { toast } from "react-toastify";
 import { useUser } from "../context/UserContext";
+import { useState } from "react";
 export const TransactionForm = () => {
-  const { getAllTransactions, toggleModal } = useUser();
-  const initialState = {
-    type: "",
-    title: "",
-    amount: "",
-    tranDate: "",
-  };
+  const {
+    getAllTransactions,
+    toggleModal,
+    transactionById,
+    editState,
+    setEditState,
+  } = useUser();
+  const [transactionId, setTransactionId] = useState(null);
+  useEffect(() => {
+    // Check if transactionById is set to determine if we are editing
+    if (transactionById && Object.keys(transactionById).length > 0) {
+      setEditState(true);
+      setTransactionId(transactionById._id);
+      // If transactionById is not empty, we are in edit mode
+    } else {
+      setEditState(false);
+    }
+  }, [transactionById, setEditState]);
+  let initialState = {};
+
+  if (editState) {
+    initialState = {
+      title: transactionById.title,
+      amount: transactionById.amount,
+      tranDate: transactionById.tranDate.split("T")[0],
+    };
+    // setEditState(true);
+  } else {
+    initialState = {
+      type: "",
+      title: "",
+      amount: "",
+      tranDate: "",
+    };
+  }
   const { form, handleOnChange, setForm } = useForm(initialState);
+
   const fields = [
     {
       label: "Title",
@@ -42,6 +73,24 @@ export const TransactionForm = () => {
   ];
   const handleOnSubmit = async (e) => {
     e.preventDefault();
+    if (editState) {
+      console.log("Updating transaction with ID:", transactionId);
+      const pendingResponse = updateTransaction({ transactionId, form });
+      toast.promise(pendingResponse, {
+        pending: "Please wait...",
+      });
+      const { status, message } = await pendingResponse;
+      toast[status](message);
+      if (status === "success") {
+        setEditState(false);
+        setForm(initialState);
+        // Reset form on success
+        getAllTransactions();
+        //close modal
+        toggleModal(false);
+      }
+      return;
+    }
     const pendingResponse = postTransaction(form);
     toast.promise(pendingResponse, {
       pending: "Please wait...",
@@ -58,7 +107,12 @@ export const TransactionForm = () => {
   };
   return (
     <div className="border rounded p-4">
-      <h4 className="mb-4">Enter your Transaction!</h4>
+      {editState ? (
+        <h4 className="mb-4">Edit your Transaction</h4>
+      ) : (
+        <h4 className="mb-4">Add your Transaction</h4>
+      )}
+      {/* <h4 className="mb-4">Enter your Transaction!</h4> */}
       <Form onSubmit={handleOnSubmit}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Transaction Type</Form.Label>

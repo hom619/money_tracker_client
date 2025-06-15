@@ -1,4 +1,4 @@
-import { React, use, useEffect, useState } from "react";
+import { React, useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import moment from "moment";
 import { useUser } from "../context/UserContext";
@@ -7,11 +7,21 @@ import { MdAssignmentAdd } from "react-icons/md";
 import Button from "react-bootstrap/esm/Button";
 import { deleteTransactions } from "../../helpers/axiosHelper";
 import { toast } from "react-toastify";
+import { CiEdit } from "react-icons/ci";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 export const TransactionTable = () => {
   const [displayTransactions, setDisplayTransactions] = useState([]);
-  const { transactions, toggleModal, getAllTransactions } = useUser();
+  const {
+    transactions,
+    toggleModal,
+    getAllTransactions,
+    setTransactionById,
+    transactionById,
+    setEditState,
+  } = useUser();
   const [idsToDelete, setIdsToDelete] = useState([]);
+
   useEffect(() => {
     setDisplayTransactions(transactions);
   }, [transactions]);
@@ -41,6 +51,24 @@ export const TransactionTable = () => {
       // Reset the idsToDelete state after deletion
       setIdsToDelete([]);
     }
+  };
+  const handleOnEdit = (id) => {
+    // Find the transaction by id
+    const transactionById = displayTransactions.find(
+      (transaction) => transaction._id === id
+    );
+    setTransactionById(transactionById);
+    setEditState(true);
+    toggleModal(true);
+    // Assuming you have a method to set the current transaction in your context
+  };
+  const addTransaction = () => {
+    setTransactionById({});
+    setEditState(false);
+    toggleModal(true);
+    // Reset the form or set it to initial state if needed
+    // Assuming you have a method to reset the form in your context
+    // resetForm();
   };
   const handleOnSelect = (e) => {
     const { checked, value } = e.target;
@@ -83,7 +111,7 @@ export const TransactionTable = () => {
             />
           </div>
           <div>
-            <MdAssignmentAdd onClick={() => toggleModal(true)} />
+            <MdAssignmentAdd onClick={() => addTransaction()} />
           </div>
         </div>
         <div>
@@ -101,6 +129,7 @@ export const TransactionTable = () => {
               <th>Transaction Description</th>
               <th>Expense</th>
               <th>Income</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -123,6 +152,11 @@ export const TransactionTable = () => {
                     {transaction.type === "income"
                       ? `$${transaction.amount}`
                       : "0"}
+                  </td>
+                  <td>
+                    <CiEdit onClick={() => handleOnEdit(transaction._id)} />
+                    &nbsp;
+                    <RiDeleteBinLine className="text-danger" />
                   </td>
                 </tr>
               ))}

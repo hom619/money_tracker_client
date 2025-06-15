@@ -3,11 +3,18 @@ import { getTransactions } from "../../helpers/axiosHelper";
 export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({});
+  const [editState, setEditState] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const getAllTransactions = async () => {
     const { status, transactions } = await getTransactions();
     status === "success" && setTransactions(transactions);
   };
+  const [transactionById, setTransactionById] = useState([]);
+  // const getTransactionById = async (id) => {
+  //   const transaction = await transactions.find((tran) => tran._id === id);
+  //   console.log(transaction);
+  //   return transaction;
+  // };
   const [show, setShow] = useState(false);
 
   const toggleModal = (value) => setShow(value);
@@ -19,6 +26,10 @@ export const UserProvider = ({ children }) => {
         getAllTransactions,
         transactions,
         toggleModal,
+        setTransactionById,
+        transactionById,
+        setEditState,
+        editState,
         show,
       }}
     >
