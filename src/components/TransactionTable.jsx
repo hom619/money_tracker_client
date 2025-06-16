@@ -5,7 +5,10 @@ import { useUser } from "../context/UserContext";
 import Form from "react-bootstrap/Form";
 import { MdAssignmentAdd } from "react-icons/md";
 import Button from "react-bootstrap/esm/Button";
-import { deleteTransactions } from "../../helpers/axiosHelper";
+import {
+  deleteTransactionById,
+  deleteTransactions,
+} from "../../helpers/axiosHelper";
 import { toast } from "react-toastify";
 import { CiEdit } from "react-icons/ci";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -17,8 +20,8 @@ export const TransactionTable = () => {
     toggleModal,
     getAllTransactions,
     setTransactionById,
-    transactionById,
     setEditState,
+    createPendingState,
   } = useUser();
   const [idsToDelete, setIdsToDelete] = useState([]);
 
@@ -35,6 +38,16 @@ export const TransactionTable = () => {
     // Assuming you have a method to set transactions in your context
     // setTransactions(filteredTransactions);
   };
+  const handleOnDeleteById = async (id) => {
+    if (confirm(`Are you sure you want to delete this transaction?`)) {
+      const pendingResponse = deleteTransactionById(id);
+      createPendingState(pendingResponse);
+      const { status, message } = await pendingResponse;
+      toast[status](message);
+      status === "success" && getAllTransactions();
+      console.log(id);
+    }
+  };
   const handleOnDelete = async () => {
     if (
       confirm(
@@ -42,9 +55,7 @@ export const TransactionTable = () => {
       )
     ) {
       const pendingResponse = deleteTransactions(idsToDelete);
-      toast.promise(pendingResponse, {
-        pending: "Please wait...",
-      });
+      createPendingState(pendingResponse);
       const { status, message } = await pendingResponse;
       toast[status](message);
       status === "success" && getAllTransactions();
@@ -136,12 +147,15 @@ export const TransactionTable = () => {
             {displayTransactions.length > 0 &&
               displayTransactions.map((transaction) => (
                 <tr key={transaction._id}>
-                  <Form.Check
-                    label={moment(transaction.tranDate).format("MMMM D, Y")}
-                    value={transaction._id}
-                    onChange={handleOnSelect}
-                    checked={idsToDelete.includes(transaction._id)}
-                  />
+                  <td>
+                    <Form.Check
+                      label={moment(transaction.tranDate).format("MMMM D, Y")}
+                      value={transaction._id}
+                      onChange={handleOnSelect}
+                      checked={idsToDelete.includes(transaction._id)}
+                    />
+                  </td>
+
                   <td>{transaction.title}</td>
                   <td className="expense">
                     {transaction.type === "expense"
@@ -156,7 +170,10 @@ export const TransactionTable = () => {
                   <td>
                     <CiEdit onClick={() => handleOnEdit(transaction._id)} />
                     &nbsp;
-                    <RiDeleteBinLine className="text-danger" />
+                    <RiDeleteBinLine
+                      onClick={() => handleOnDeleteById(transaction._id)}
+                      className="text-danger"
+                    />
                   </td>
                 </tr>
               ))}
@@ -168,7 +185,7 @@ export const TransactionTable = () => {
                   .filter((t) => t.type === "expense")
                   .reduce((acc, tran) => acc + tran.amount, 0)}
               </td>
-              <td>
+              <td colSpan={2}>
                 $
                 {displayTransactions
                   .filter((t) => t.type === "income")

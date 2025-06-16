@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { getTransactions } from "../../helpers/axiosHelper";
+import { toast } from "react-toastify";
 export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({});
@@ -10,11 +11,11 @@ export const UserProvider = ({ children }) => {
     status === "success" && setTransactions(transactions);
   };
   const [transactionById, setTransactionById] = useState([]);
-  // const getTransactionById = async (id) => {
-  //   const transaction = await transactions.find((tran) => tran._id === id);
-  //   console.log(transaction);
-  //   return transaction;
-  // };
+  const createPendingState = (pendingResponse) => {
+    toast.promise(pendingResponse, {
+      pending: "Please wait...",
+    });
+  };
   const [show, setShow] = useState(false);
 
   const toggleModal = (value) => setShow(value);
@@ -31,6 +32,7 @@ export const UserProvider = ({ children }) => {
         setEditState,
         editState,
         show,
+        createPendingState,
       }}
     >
       {children}

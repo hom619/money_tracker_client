@@ -104,3 +104,14 @@ export const deleteTransactions = (data) => {
   };
   return apiProcessor(obj);
 };
+export const deleteTransactionById = (id) => {
+  const obj = {
+    method: "delete",
+    url: rootAPIEndpoint + "/transactions/id",
+    data: { transactionId: id },
+    headers: {
+      Authorization: getToken(),
+    },
+  };
+  return apiProcessor(obj);
+};

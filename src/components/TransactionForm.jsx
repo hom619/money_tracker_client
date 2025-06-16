@@ -15,6 +15,7 @@ export const TransactionForm = () => {
     transactionById,
     editState,
     setEditState,
+    createPendingState,
   } = useUser();
   const [transactionId, setTransactionId] = useState(null);
   useEffect(() => {
@@ -74,11 +75,8 @@ export const TransactionForm = () => {
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     if (editState) {
-      console.log("Updating transaction with ID:", transactionId);
       const pendingResponse = updateTransaction({ transactionId, form });
-      toast.promise(pendingResponse, {
-        pending: "Please wait...",
-      });
+      createPendingState(pendingResponse);
       const { status, message } = await pendingResponse;
       toast[status](message);
       if (status === "success") {
@@ -92,11 +90,9 @@ export const TransactionForm = () => {
       return;
     }
     const pendingResponse = postTransaction(form);
-    toast.promise(pendingResponse, {
-      pending: "Please wait...",
-    });
+    createPendingState(pendingResponse);
     const { status, message } = await pendingResponse;
-    toast[status](message, { theme: "dark" });
+    toast[status](message);
     if (status === "success") {
       setForm(initialState);
       // Reset form on success
