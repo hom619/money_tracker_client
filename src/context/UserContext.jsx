@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
     });
   };
   const [show, setShow] = useState(false);
-
+  const [chartData, setChartData] = useState([]);
   const toggleModal = (value) => setShow(value);
   return (
     <UserContext.Provider
@@ -33,6 +33,8 @@ export const UserProvider = ({ children }) => {
         editState,
         show,
         createPendingState,
+        chartData,
+        setChartData,
       }}
     >
       {children}

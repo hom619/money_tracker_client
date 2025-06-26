@@ -1,14 +1,89 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
 .wrapper {
   min-height: 100vh;
   background: black;
   color: #e4e3e3f0;
+  display: flex;
+  flex-direction: column;
+}
+.layout {
+  flex: 1;
+  display: flex;
+  min-height: 0; /* important to avoid overflow issues */
 }
 .main {
   min-height: calc(100vh - 150px);
+  background: white;
+  /* margin-left: 200px; */
+  font-family: "Roboto", sans-serif;
+  overflow-y: auto;
+  flex: 1;
+}
+.sidebar {
+  width: 200px;
+  background-color: #fffafa;
+  border-right: 1px solid #eee;
+  overflow-y: auto;
+  /* position: fixed; */
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2d6a4f;
+  margin-bottom: 1rem;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: gray !important;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin: 4px 0;
+  /* transition: background 0.2s; */
+}
+
+.nav-item.active,
+.nav-item:hover {
+  background: linear-gradient(to bottom left, #ffd700, #2e8b57, #00573f);
+  color: whitesmoke !important;
+  font-weight: 500;
+}
+.topDasboardItems {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: black;
+  background: #e5e4e2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .expense {
   color: rgb(239, 89, 89) !important;
 }
 .income {
   color: rgb(17, 205, 120) !important;
+}
+.dashboardCounts {
+  width: 100%;
+  height: 100%;
+  margin: 10px;
+  border: 1px solid #eceaea;
+}
+/* .customLabel {
+  background-color: rgba(159, 246, 231, 0.826);
+  color: whitesmoke;
+  border-radius: 20px;
+} */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
 }

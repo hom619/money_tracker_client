@@ -86,6 +86,8 @@ export const TransactionForm = () => {
         getAllTransactions();
         //close modal
         toggleModal(false);
+      } else {
+        toast.error("Failed to update transaction. Please try again.");
       }
       return;
     }
@@ -99,6 +101,8 @@ export const TransactionForm = () => {
       getAllTransactions();
       //close modal
       toggleModal(false);
+    } else {
+      toast.error("Failed to add transaction. Please try again.");
     }
   };
   return (

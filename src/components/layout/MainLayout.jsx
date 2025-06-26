@@ -6,13 +6,14 @@ import { Header } from "./Header";
 export const MainLayout = () => {
   return (
     <div>
-      {/* NavBar */}
-      <Header />
-      {/* Body */}
-      <main className="main">
-        <Outlet />
-      </main>
-
+      <div className="layout">
+        {/* NavBar */}
+        <Header />
+        <main className="main">
+          {/* Body */}
+          <Outlet />
+        </main>
+      </div>
       {/* Footer */}
       <Footer />
     </div>

@@ -1,6 +1,5 @@
 import axios from "axios";
 const rootAPIEndpoint = import.meta.env.VITE_ROOT_URL + "/api/v1";
-console.log("API Endpoint: ", rootAPIEndpoint);
 const getToken = () => {
   return localStorage.getItem("accessJWT");
 };

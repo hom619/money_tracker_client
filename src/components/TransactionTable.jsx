@@ -5,6 +5,7 @@ import { useUser } from "../context/UserContext";
 import Form from "react-bootstrap/Form";
 import { MdAssignmentAdd } from "react-icons/md";
 import Button from "react-bootstrap/esm/Button";
+import CustomDatePicker from "../components/CustomDatePicker";
 import {
   deleteTransactionById,
   deleteTransactions,
@@ -12,9 +13,12 @@ import {
 import { toast } from "react-toastify";
 import { CiEdit } from "react-icons/ci";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { MdArrowOutward } from "react-icons/md";
+import { FiArrowDownRight } from "react-icons/fi";
 
 export const TransactionTable = () => {
   const [displayTransactions, setDisplayTransactions] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
   const {
     transactions,
     toggleModal,
@@ -28,6 +32,9 @@ export const TransactionTable = () => {
   useEffect(() => {
     setDisplayTransactions(transactions);
   }, [transactions]);
+  const balance = displayTransactions.reduce((acc, tran) => {
+    return tran.type === "income" ? acc + tran.amount : acc - tran.amount;
+  }, 0);
   const handleOnSearch = (e) => {
     const searchValue = e.target.value.toLowerCase();
     const filteredTransactions = transactions.filter((transaction) =>
@@ -45,7 +52,6 @@ export const TransactionTable = () => {
       const { status, message } = await pendingResponse;
       toast[status](message);
       status === "success" && getAllTransactions();
-      console.log(id);
     }
   };
   const handleOnDelete = async () => {
@@ -81,6 +87,13 @@ export const TransactionTable = () => {
     // Assuming you have a method to reset the form in your context
     // resetForm();
   };
+  const handleOnSearchByDate = (date) => {
+    setSelectedDate(date);
+    const filteredTransactions = transactions.filter(
+      (tran) => new Date(tran.tranDate) >= new Date(date)
+    );
+    setDisplayTransactions(filteredTransactions);
+  };
   const handleOnSelect = (e) => {
     const { checked, value } = e.target;
     if (value === "all") {
@@ -99,33 +112,41 @@ export const TransactionTable = () => {
   };
   return (
     <>
-      <div>
-        <div className="d-flex justify-content-between mb-3">
+      <div className="border rounded p-2">
+        <div className="d-flex justify-content-between">
           <div>
             <label className="fw-bold fs-3">Transaction History</label>{" "}
-            <label
-              className="border"
-              style={{
-                "border-radius": "25px",
-                width: "60px",
-                padding: "2px",
-              }}
-            >
-              {displayTransactions.length} Total
-            </label>
           </div>
-          <div>
-            <Form.Control
-              type="text"
-              onChange={handleOnSearch}
-              placeholder="Search..."
-            />
-          </div>
-          <div>
-            <MdAssignmentAdd onClick={() => addTransaction()} />
+          <div className="d-flex justify-content-end m-2 gap-2">
+            <div>
+              <Form.Control
+                type="text"
+                onChange={handleOnSearch}
+                placeholder="Search..."
+              />
+            </div>
+
+            <div>
+              <CustomDatePicker
+                selectedDate={selectedDate}
+                onChange={handleOnSearchByDate}
+              />
+            </div>
+            <div>
+              <Button
+                className="rounded-pill"
+                style={{ background: "#00573f" }}
+                onClick={() => addTransaction()}
+              >
+                <MdAssignmentAdd /> Add Transaction
+              </Button>
+            </div>
           </div>
         </div>
-        <div>
+        <div className="d-flex gap-3">
+          <label className="text-secondary mb-2">
+            You have {displayTransactions.length} transaction(s){" "}
+          </label>
           <Form.Check
             label="Select All"
             value="all"
@@ -133,6 +154,7 @@ export const TransactionTable = () => {
             checked={idsToDelete.length === displayTransactions.length}
           />
         </div>
+        <hr className="m-0"></hr>
         <Table hover>
           <thead>
             <tr>
@@ -157,12 +179,17 @@ export const TransactionTable = () => {
                   </td>
 
                   <td>{transaction.title}</td>
+
                   <td className="expense">
+                    <FiArrowDownRight className="border rounded" />
+                    &nbsp;
                     {transaction.type === "expense"
                       ? `$${transaction.amount}`
                       : "0"}
                   </td>
                   <td className="income">
+                    <MdArrowOutward className="border rounded" />
+                    &nbsp;
                     {transaction.type === "income"
                       ? `$${transaction.amount}`
                       : "0"}
@@ -179,13 +206,13 @@ export const TransactionTable = () => {
               ))}
             <tr className="fw-bold text-start">
               <td colSpan={2}>Total</td>
-              <td>
+              <td className="expense">
                 $
                 {displayTransactions
                   .filter((t) => t.type === "expense")
                   .reduce((acc, tran) => acc + tran.amount, 0)}
               </td>
-              <td colSpan={2}>
+              <td colSpan={2} className="income">
                 $
                 {displayTransactions
                   .filter((t) => t.type === "income")
@@ -194,13 +221,8 @@ export const TransactionTable = () => {
             </tr>
             <tr className="fw-bold text-start">
               <td colSpan={3}>Total Balance</td>
-              <td colSpan={2}>
-                $
-                {displayTransactions.reduce((acc, tran) => {
-                  return tran.type === "income"
-                    ? acc + tran.amount
-                    : acc - tran.amount;
-                }, 0)}
+              <td colSpan={2} className={balance > 0 ? "income" : "expense"}>
+                $ {balance}
               </td>
             </tr>
           </tbody>

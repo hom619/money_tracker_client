@@ -15,12 +15,11 @@ export const Transactions = () => {
   }, []);
   return (
     <Container className="p-5">
-      <Row className="bg-dark p-5 rounded">
+      <Row className="bg-white p-2 rounded text-dark">
         <Col>
           <CustomModal>
             <TransactionForm />
           </CustomModal>
-          <hr></hr>
           <TransactionTable />
         </Col>
       </Row>
