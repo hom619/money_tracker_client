@@ -55,6 +55,46 @@ body,
   color: whitesmoke !important;
   font-weight: 500;
 }
+.input-group:focus-within .form-control,
+.input-group:focus-within .input-group-text {
+  box-shadow: none !important;
+  border-color: green !important;
+}
+
+/* Optional: remove divider between icon and input */
+.input-group .input-group-text {
+  border-right: none !important;
+}
+
+.input-group .form-control {
+  border-left: none !important;
+}
+.input-group .input-group-text {
+  border-left: none !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.input-group .form-control {
+  border-right: none !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.input-group {
+  border: 1px solid #ced4da; /* or green, or whatever you want */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.submitButton {
+  background: linear-gradient(to bottom left, #ffd700, #2e8b57, #00573f);
+}
+.signUpBackground {
+  background-image: url("./assets/img6.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+}
 .topDasboardItems {
   width: 40px;
   height: 40px;
@@ -82,6 +122,41 @@ body,
   color: whitesmoke;
   border-radius: 20px;
 } */
+.loadingSpinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.8); /* semi-transparent white */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* keep on top */
+  font-size: 80px; /* make the icon big */
+  color: #00573f; /* match your app theme */
+  animation: spin 1.2s linear infinite;
+}
+.loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinnerIcon {
+  font-size: 100px;
+  color: #00573f;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;

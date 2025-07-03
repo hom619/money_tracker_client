@@ -72,19 +72,12 @@ export const FinancialTips = () => {
   }, []);
   return (
     <div
-      className="d-flex flex-column justify-content-center"
+      className="bg-white border rounded d-flex flex-column justify-content-center"
       style={{ height: "100%" }}
     >
-      <div className="mb-3">
-        <TbPigMoney className="text-success" style={{ fontSize: "20rem" }} />
-        {/* <GiReceiveMoney
-          className="text-success"
-          style={{ fontSize: "10rem" }}
-        /> */}
-        {/* <GiMoneyStack className="text-success" style={{ fontSize: "20rem" }} /> */}
-      </div>
-      <h4>{tip}</h4>
-      <div className="fw-bolder">
+      <div className="signUpBackground mb-3"></div>
+      <h4 style={{ color: "#2e8b57", margin: "10px" }}>{tip}</h4>
+      <div className="fw-bolder text-secondary m-2">
         "{quote}" - {expert}
       </div>
     </div>

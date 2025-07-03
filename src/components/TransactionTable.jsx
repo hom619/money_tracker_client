@@ -19,6 +19,7 @@ import { FiArrowDownRight } from "react-icons/fi";
 export const TransactionTable = () => {
   const [displayTransactions, setDisplayTransactions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [loading, setLoading] = useState(false);
   const {
     transactions,
     toggleModal,
@@ -31,6 +32,7 @@ export const TransactionTable = () => {
 
   useEffect(() => {
     setDisplayTransactions(transactions);
+    setLoading(false);
   }, [transactions]);
   const balance = displayTransactions.reduce((acc, tran) => {
     return tran.type === "income" ? acc + tran.amount : acc - tran.amount;
@@ -112,129 +114,135 @@ export const TransactionTable = () => {
   };
   return (
     <>
-      <div className="border rounded p-2">
-        <div className="d-flex justify-content-between">
-          <div>
-            <label className="fw-bold fs-3">Transaction History</label>{" "}
-          </div>
-          <div className="d-flex justify-content-end m-2 gap-2">
+      {loading ? (
+        <>
+          <span className="spinner" />
+        </>
+      ) : (
+        <div className="border rounded p-2">
+          <div className="d-flex justify-content-between">
             <div>
-              <Form.Control
-                type="text"
-                onChange={handleOnSearch}
-                placeholder="Search..."
-              />
+              <label className="fw-bold fs-3">Transaction History</label>{" "}
             </div>
+            <div className="d-flex justify-content-end m-2 gap-2">
+              <div>
+                <Form.Control
+                  type="text"
+                  onChange={handleOnSearch}
+                  placeholder="Search..."
+                />
+              </div>
 
-            <div>
-              <CustomDatePicker
-                selectedDate={selectedDate}
-                onChange={handleOnSearchByDate}
-              />
+              <div>
+                <CustomDatePicker
+                  selectedDate={selectedDate}
+                  onChange={handleOnSearchByDate}
+                />
+              </div>
+              <div>
+                <Button
+                  className="rounded-pill"
+                  style={{ background: "#00573f" }}
+                  onClick={() => addTransaction()}
+                >
+                  <MdAssignmentAdd /> Add Transaction
+                </Button>
+              </div>
             </div>
-            <div>
-              <Button
-                className="rounded-pill"
-                style={{ background: "#00573f" }}
-                onClick={() => addTransaction()}
-              >
-                <MdAssignmentAdd /> Add Transaction
+          </div>
+          <div className="d-flex gap-3">
+            <label className="text-secondary mb-2">
+              You have {displayTransactions.length} transaction(s){" "}
+            </label>
+            <Form.Check
+              label="Select All"
+              value="all"
+              onChange={handleOnSelect}
+              checked={idsToDelete.length === displayTransactions.length}
+            />
+          </div>
+          <hr className="m-0"></hr>
+          <Table hover>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Transaction Description</th>
+                <th>Expense</th>
+                <th>Income</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayTransactions.length > 0 &&
+                displayTransactions.map((transaction) => (
+                  <tr key={transaction._id}>
+                    <td>
+                      <Form.Check
+                        label={moment(transaction.tranDate).format("MMMM D, Y")}
+                        value={transaction._id}
+                        onChange={handleOnSelect}
+                        checked={idsToDelete.includes(transaction._id)}
+                      />
+                    </td>
+
+                    <td>{transaction.title}</td>
+
+                    <td className="expense">
+                      <FiArrowDownRight className="border rounded" />
+                      &nbsp;
+                      {transaction.type === "expense"
+                        ? `$${transaction.amount}`
+                        : "0"}
+                    </td>
+                    <td className="income">
+                      <MdArrowOutward className="border rounded" />
+                      &nbsp;
+                      {transaction.type === "income"
+                        ? `$${transaction.amount}`
+                        : "0"}
+                    </td>
+                    <td>
+                      <CiEdit onClick={() => handleOnEdit(transaction._id)} />
+                      &nbsp;
+                      <RiDeleteBinLine
+                        onClick={() => handleOnDeleteById(transaction._id)}
+                        className="text-danger"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              <tr className="fw-bold text-start">
+                <td colSpan={2}>Total</td>
+                <td className="expense">
+                  $
+                  {displayTransactions
+                    .filter((t) => t.type === "expense")
+                    .reduce((acc, tran) => acc + tran.amount, 0)}
+                </td>
+                <td colSpan={2} className="income">
+                  $
+                  {displayTransactions
+                    .filter((t) => t.type === "income")
+                    .reduce((acc, tran) => acc + tran.amount, 0)}
+                </td>
+              </tr>
+              <tr className="fw-bold text-start">
+                <td colSpan={3}>Total Balance</td>
+                <td colSpan={2} className={balance > 0 ? "income" : "expense"}>
+                  $ {balance}
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+          {idsToDelete.length > 0 && (
+            <div className="d-grid">
+              <Button variant="danger" onClick={handleOnDelete}>
+                Delete {idsToDelete.length} Transaction(s)
               </Button>
             </div>
-          </div>
+          )}
         </div>
-        <div className="d-flex gap-3">
-          <label className="text-secondary mb-2">
-            You have {displayTransactions.length} transaction(s){" "}
-          </label>
-          <Form.Check
-            label="Select All"
-            value="all"
-            onChange={handleOnSelect}
-            checked={idsToDelete.length === displayTransactions.length}
-          />
-        </div>
-        <hr className="m-0"></hr>
-        <Table hover>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Transaction Description</th>
-              <th>Expense</th>
-              <th>Income</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayTransactions.length > 0 &&
-              displayTransactions.map((transaction) => (
-                <tr key={transaction._id}>
-                  <td>
-                    <Form.Check
-                      label={moment(transaction.tranDate).format("MMMM D, Y")}
-                      value={transaction._id}
-                      onChange={handleOnSelect}
-                      checked={idsToDelete.includes(transaction._id)}
-                    />
-                  </td>
-
-                  <td>{transaction.title}</td>
-
-                  <td className="expense">
-                    <FiArrowDownRight className="border rounded" />
-                    &nbsp;
-                    {transaction.type === "expense"
-                      ? `$${transaction.amount}`
-                      : "0"}
-                  </td>
-                  <td className="income">
-                    <MdArrowOutward className="border rounded" />
-                    &nbsp;
-                    {transaction.type === "income"
-                      ? `$${transaction.amount}`
-                      : "0"}
-                  </td>
-                  <td>
-                    <CiEdit onClick={() => handleOnEdit(transaction._id)} />
-                    &nbsp;
-                    <RiDeleteBinLine
-                      onClick={() => handleOnDeleteById(transaction._id)}
-                      className="text-danger"
-                    />
-                  </td>
-                </tr>
-              ))}
-            <tr className="fw-bold text-start">
-              <td colSpan={2}>Total</td>
-              <td className="expense">
-                $
-                {displayTransactions
-                  .filter((t) => t.type === "expense")
-                  .reduce((acc, tran) => acc + tran.amount, 0)}
-              </td>
-              <td colSpan={2} className="income">
-                $
-                {displayTransactions
-                  .filter((t) => t.type === "income")
-                  .reduce((acc, tran) => acc + tran.amount, 0)}
-              </td>
-            </tr>
-            <tr className="fw-bold text-start">
-              <td colSpan={3}>Total Balance</td>
-              <td colSpan={2} className={balance > 0 ? "income" : "expense"}>
-                $ {balance}
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-        {idsToDelete.length > 0 && (
-          <div className="d-grid">
-            <Button variant="danger" onClick={handleOnDelete}>
-              Delete {idsToDelete.length} Transaction(s)
-            </Button>
-          </div>
-        )}
-      </div>
+      )}
     </>
   );
 };

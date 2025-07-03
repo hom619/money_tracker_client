@@ -4,6 +4,8 @@ import { CustomInput } from "./CustomInput";
 import { toast } from "react-toastify";
 import { postUser } from "../../helpers/axiosHelper";
 import { useForm } from "../hooks/useForm";
+import { useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 export const SignUpForm = () => {
   const initialState = {
     name: "",
@@ -11,6 +13,7 @@ export const SignUpForm = () => {
     password: "",
     confirmPassword: "",
   };
+  const navigate = useNavigate();
   const { form, handleOnChange, setForm } = useForm(initialState);
   const fields = [
     {
@@ -20,6 +23,8 @@ export const SignUpForm = () => {
       type: "text",
       name: "name",
       value: form.name,
+      leftIcon: <FaUser />,
+      variant: "signup",
     },
     {
       label: "Email",
@@ -28,6 +33,8 @@ export const SignUpForm = () => {
       type: "email",
       name: "email",
       value: form.email,
+      leftIcon: <FaEnvelope />,
+      variant: "signup",
     },
     {
       label: "Password",
@@ -36,6 +43,9 @@ export const SignUpForm = () => {
       type: "password",
       name: "password",
       value: form.password,
+      showToggle: true,
+      leftIcon: <FaLock />,
+      variant: "signup",
     },
     {
       label: "Confirm Password",
@@ -43,30 +53,76 @@ export const SignUpForm = () => {
       required: true,
       type: "password",
       name: "confirmPassword",
+      showToggle: true,
       value: form.confirmPassword,
     },
   ];
+
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     const { confirmPassword, ...rest } = form;
+    const passwordValidationId = "password-match-validation";
     if (confirmPassword !== rest.password) {
-      return toast.error("Passwords don't match", { theme: "dark" });
+      if (!toast.isActive(passwordValidationId)) {
+        return toast.error("Passwords don't match", {
+          toastId: passwordValidationId,
+        });
+      }
+      return;
     }
-    const { status, message } = await postUser(rest);
-    toast[status](message);
-    status === "success" && setForm(initialState);
+    const pendingToastId = "sing-up-pending";
+    const pendingResponse = postUser(form);
+    if (!toast.isActive(pendingToastId)) {
+      toast.promise(
+        pendingResponse,
+        {
+          pending: "Please wait...",
+        },
+        {
+          toastId: pendingToastId,
+        }
+      );
+    }
+
+    const { status, message } = await pendingResponse;
+    const resultToastId = `login-result-${status}-${message}`;
+    if (!toast.isActive(resultToastId)) {
+      toast[status](message, { toastId: resultToastId });
+    }
+    if (status === "success") {
+      setForm(initialState);
+      navigate("/");
+    }
   };
   return (
-    <div className="border rounded p-4">
-      <h4 className="mb-4">Sign up here!</h4>
-      <Form onSubmit={handleOnSubmit}>
+    <div className="bg-white border rounded p-4">
+      <h2
+        className="mb-4 fw-bold"
+        style={{
+          color: "#00573f",
+        }}
+      >
+        Create an Account!
+      </h2>
+      <Form className="text-secondary" onSubmit={handleOnSubmit}>
         {fields.map((field) => (
           <CustomInput key={field.name} {...field} onChange={handleOnChange} />
         ))}
         <div className="d-grid">
-          <Button variant="primary" type="submit">
+          <Button className="submitButton" type="submit">
             Submit
           </Button>
+        </div>
+        <div>
+          <p className="mt-3 text-center">
+            Already have an account?{" "}
+            <label
+              style={{ color: "green", cursor: "pointer" }}
+              onClick={() => navigate("/")}
+            >
+              Login here
+            </label>
+          </p>
         </div>
       </Form>
     </div>

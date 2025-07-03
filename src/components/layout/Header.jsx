@@ -12,13 +12,13 @@ import { useUser } from "../../context/UserContext";
 
 export const Header = () => {
   const { user, setUser } = useUser();
-  const [expandMenu, setExpandMenu] = useState(false);
+  //const [expandMenu, setExpandMenu] = useState(false);
   const handleOnLogOut = () => {
     //remove the access token from the local storage
     localStorage.removeItem("accessJWT");
     setUser({});
     //redirect to the login page
-    setExpandMenu(false);
+    //setExpandMenu(false);
   };
   return (
     // <div className="sidebar d-flex flex-column p-3">
@@ -48,7 +48,7 @@ export const Header = () => {
     //   </Nav>
     // </div>
     <>
-      {user?._id ? (
+      {user?._id && (
         <div className="sidebar d-flex flex-column p-3">
           <h2 className="brand">🟢 Donezo</h2>
 
@@ -81,40 +81,6 @@ export const Header = () => {
             </NavLink>
           </Nav>
         </div>
-      ) : (
-        <Navbar
-          expand="lg"
-          variant="dark"
-          className="bg-body-dark"
-          expanded={expandMenu}
-        >
-          <Container>
-            <Navbar.Brand href="#home">Donezo</Navbar.Brand>
-            <Navbar.Toggle
-              aria-controls="basic-navbar-nav"
-              onClick={() => setExpandMenu(true)}
-            />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="ms-auto">
-                <Link
-                  className="nav-link"
-                  to="/"
-                  onClick={() => setExpandMenu(false)}
-                >
-                  <TbLogin /> Login
-                </Link>
-                <Link
-                  className="nav-link"
-                  to="/signup"
-                  onClick={() => setExpandMenu(false)}
-                >
-                  <IoCreate />
-                  Sign up
-                </Link>
-              </Nav>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
       )}
     </>
     // <Navbar

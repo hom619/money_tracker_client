@@ -7,6 +7,7 @@ import { loginUser } from "../../helpers/axiosHelper";
 import { useUser } from "../context/UserContext";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 export const SignInForm = () => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ export const SignInForm = () => {
       required: true,
       type: "email",
       name: "email",
+      leftIcon: <FaEnvelope />,
+      variant: "login",
     },
     {
       label: "Password",
@@ -29,6 +32,9 @@ export const SignInForm = () => {
       required: true,
       type: "password",
       name: "password",
+      leftIcon: <FaLock />,
+      showToggle: true,
+      variant: "login",
     },
   ];
   const { form, handleOnChange } = useForm(initialState);
@@ -39,29 +45,78 @@ export const SignInForm = () => {
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = form;
+
+    // Prevent duplicate "fill in fields" error
+    const emptyFieldToastId = "empty-fields";
     if (!email || !password) {
-      return toast.error("Please fill in all fields", { theme: "dark" });
+      if (!toast.isActive(emptyFieldToastId)) {
+        return toast.error("Please fill in all fields", {
+          toastId: emptyFieldToastId,
+        });
+      }
+      return;
     }
+
+    // Show unique pending toast
+    const pendingToastId = "login-pending";
     const pendingResponse = loginUser(form);
-    toast.promise(pendingResponse, {
-      pending: "Please wait...",
-    });
+    if (!toast.isActive(pendingToastId)) {
+      toast.promise(
+        pendingResponse,
+        {
+          pending: "Please wait...",
+        },
+        {
+          toastId: pendingToastId,
+        }
+      );
+    }
+
+    // Wait for response
     const { status, message, user, accessJWT } = await pendingResponse;
-    toast[status](message);
+
+    // Prevent duplicate success/error messages
+    const resultToastId = `login-result-${status}-${message}`;
+    if (!toast.isActive(resultToastId)) {
+      toast[status](message, { toastId: resultToastId });
+    }
+
+    // Handle login state
     setUser(user);
     localStorage.setItem("accessJWT", accessJWT);
   };
   return (
-    <div className="border rounded p-4">
-      <h4 className="mb-4">Welcome Back!</h4>
-      <Form onSubmit={handleOnSubmit}>
+    <div className="bg-white border rounded p-4">
+      <div className="text-start">
+        <h2
+          className="mb-1 fw-bold"
+          style={{
+            color: "#00573f",
+          }}
+        >
+          LOGIN
+        </h2>
+      </div>
+      <label className="mb-2" style={{ color: "#2e8b57" }}>
+        Hello Again! Please sign in to continue
+      </label>
+      <Form onSubmit={handleOnSubmit} className="text-secondary">
         {fields.map((field) => (
           <CustomInput key={field.name} {...field} onChange={handleOnChange} />
         ))}
         <div className="d-grid">
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" className="submitButton">
             Submit
           </Button>
+        </div>
+        <div className="mt-2 d-flex justify-content-center gap-2">
+          <label className="text-secondary">Don't have an account?</label>
+          <label
+            style={{ color: "green", cursor: "pointer" }}
+            onClick={() => navigate("/signup")}
+          >
+            Sign Up here
+          </label>
         </div>
       </Form>
     </div>

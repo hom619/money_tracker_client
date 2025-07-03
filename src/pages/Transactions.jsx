@@ -9,20 +9,21 @@ import { CustomModal } from "../components/CustomModal.jsx";
 
 export const Transactions = () => {
   const { getAllTransactions } = useUser();
-  // Fetch all transactions when the component mounts
   useEffect(() => {
     getAllTransactions();
   }, []);
   return (
-    <Container className="p-5">
-      <Row className="bg-white p-2 rounded text-dark">
-        <Col>
-          <CustomModal>
-            <TransactionForm />
-          </CustomModal>
-          <TransactionTable />
-        </Col>
-      </Row>
-    </Container>
+    <>
+      <Container className="p-5">
+        <Row className="bg-white p-2 rounded text-dark">
+          <Col>
+            <CustomModal>
+              <TransactionForm />
+            </CustomModal>
+            <TransactionTable />
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 };
