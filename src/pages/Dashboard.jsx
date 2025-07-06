@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { AiFillDollarCircle } from "react-icons/ai";
-import { useUser } from "../context/UserContext";
-import { AiOutlineTransaction } from "react-icons/ai";
-import { IoMdTrendingUp } from "react-icons/io";
-import { IoMdTrendingDown } from "react-icons/io";
+import React, { useEffect, useState, useRef } from "react";
+import { Container, Row, Col } from "react-bootstrap";
+import { AiFillDollarCircle, AiOutlineTransaction } from "react-icons/ai";
+import { IoMdTrendingUp, IoMdTrendingDown } from "react-icons/io";
 import { FaScaleBalanced } from "react-icons/fa6";
 import { HiOutlineEnvelope } from "react-icons/hi2";
 import { GoBell } from "react-icons/go";
 import { HiUserCircle } from "react-icons/hi";
+import { MonthPicker } from "../components/MonthPicker";
 import {
   BarChart,
   Bar,
@@ -21,75 +17,113 @@ import {
   Legend,
   Rectangle,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Sector,
-  Cell,
-  Line,
   LineChart,
+  Line,
   AreaChart,
   Area,
 } from "recharts";
+import { useUser } from "../context/UserContext";
+
 export const Dashboard = () => {
   const [displayTransactions, setDisplayTransactions] = useState([]);
+  const [previousMonthBalance, setPreviousMonthBalance] = useState(0);
+  const [previousMonthTransactions, setPreviousMonthTransactions] = useState(
+    []
+  );
+  const firstLoadRef = useRef(true);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+
   const { transactions, getAllTransactions, user } = useUser();
-  // Fetch data on mount only
+
   useEffect(() => {
     getAllTransactions();
   }, []);
 
-  // Sync local display state whenever transactions change
   useEffect(() => {
-    setDisplayTransactions(transactions);
+    if (transactions.length > 0) {
+      setDisplayTransactions(transactions);
+      updateMonthData(selectedMonth ?? new Date()); // Initial comparison
+    }
   }, [transactions]);
-  const today = new Date();
-  const firstDayOfCurrentMonth = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    1
-  );
-  const lastDayOfPreviousMonth = new Date(firstDayOfCurrentMonth);
-  lastDayOfPreviousMonth.setDate(lastDayOfPreviousMonth.getDate() - 1);
-  const firstDayOfPreviousMonth = new Date(
-    lastDayOfPreviousMonth.getFullYear(),
-    lastDayOfPreviousMonth.getMonth(),
-    1
-  );
-  const previousMonthTransactions = displayTransactions.filter(
-    (transaction) => {
-      const transactionDate = new Date(transaction.tranDate); // Ensure it's a Date object
-      return (
-        transactionDate >= firstDayOfPreviousMonth &&
-        transactionDate <= lastDayOfPreviousMonth
+
+  const updateMonthData = (date) => {
+    const selected = date ?? new Date();
+
+    const currentStart = new Date(
+      selected.getFullYear(),
+      selected.getMonth(),
+      1
+    );
+    const currentEnd = new Date(
+      selected.getFullYear(),
+      selected.getMonth() + 1,
+      0
+    );
+
+    const previousStart = new Date(
+      selected.getFullYear(),
+      selected.getMonth() - 1,
+      1
+    );
+    const previousEnd = new Date(
+      selected.getFullYear(),
+      selected.getMonth(),
+      0
+    );
+
+    const previousMonthTrans = transactions.filter((t) => {
+      const d = new Date(t.tranDate);
+      return d >= previousStart && d <= previousEnd;
+    });
+
+    setPreviousMonthTransactions(previousMonthTrans);
+
+    const prevIncome = previousMonthTrans
+      .filter((t) => t.type === "income")
+      .reduce((acc, t) => acc + t.amount, 0);
+
+    const prevExpense = previousMonthTrans
+      .filter((t) => t.type === "expense")
+      .reduce((acc, t) => acc + t.amount, 0);
+
+    setPreviousMonthBalance(prevIncome - prevExpense);
+
+    if (firstLoadRef.current) {
+      // First load — show all transactions
+      setDisplayTransactions(transactions);
+      setCompareTranLength(transactions.length - previousMonthTrans.length);
+      firstLoadRef.current = false;
+    } else {
+      // After first load — filter by selected month
+      const currentMonthTrans = transactions.filter((t) => {
+        const d = new Date(t.tranDate);
+        return d >= currentStart && d <= currentEnd;
+      });
+
+      setDisplayTransactions(currentMonthTrans);
+      setCompareTranLength(
+        currentMonthTrans.length - previousMonthTrans.length
       );
     }
-  );
-  const previousMonthBalance =
-    previousMonthTransactions
-      .filter((t) => t.type === "income")
-      .reduce((acc, tran) => acc + tran.amount, 0) -
-    previousMonthTransactions
-      .filter((t) => t.type === "expense")
-      .reduce((acc, tran) => acc + tran.amount, 0);
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
-  const currentMonthTransactions = displayTransactions.filter((transaction) => {
-    const transactionDate = new Date(transaction.tranDate); // Ensure it's a Date object
-    return (
-      transactionDate.getMonth() === currentMonth &&
-      transactionDate.getFullYear() === currentYear
-    );
-  });
-  const comparisonDateLength =
-    currentMonthTransactions.length - previousMonthTransactions.length;
+  };
+
+  const handleOnSearchByMonth = (date) => {
+    setSelectedMonth(date);
+    updateMonthData(date);
+  };
+
   const income = displayTransactions
     .filter((t) => t.type === "income")
     .reduce((acc, tran) => acc + tran.amount, 0);
+
   const expense = displayTransactions
     .filter((t) => t.type === "expense")
     .reduce((acc, tran) => acc + tran.amount, 0);
+
   const totalBudget = income + expense;
   const balance = income - expense;
+
+  const [compareTranLength, setCompareTranLength] = useState(0);
   const data = Object.values(
     displayTransactions.reduce((acc, { tranDate, amount, type }) => {
       const date = tranDate.slice(0, 10);
@@ -100,35 +134,47 @@ export const Dashboard = () => {
       return acc;
     }, {})
   ).sort((a, b) => new Date(a.tranDate) - new Date(b.tranDate));
+
   return (
-    <>
-      <Container className="p-3">
-        <div
-          className="dashboardCounts rounded p-3 d-flex justify-content-end gap-2"
-          style={{ background: "#F7F7F7" }}
-        >
+    <Container fluid className="p-3">
+      {/* Top Section */}
+      <Row
+        className="dashboardCounts rounded p-3 mb-3"
+        style={{ background: "#F7F7F7" }}
+      >
+        <Col className="d-flex justify-content-end align-items-center gap-3">
+          <div className="w-md-auto">
+            <MonthPicker
+              selectedMonth={selectedMonth}
+              onChange={handleOnSearchByMonth}
+            />
+          </div>
           <div className="topDasboardItems">
             <HiOutlineEnvelope />
           </div>
           <div className="topDasboardItems">
             <GoBell />
           </div>
-          <div className="d-flex align-items-center gap-2 mr-5">
+          <div className="d-flex align-items-center gap-2">
             <HiUserCircle
-              style={{ width: "50px", height: "40px", color: "#e5e4e2" }}
+              style={{ width: "40px", height: "40px", color: "#e5e4e2" }}
             />
             <div className="d-flex flex-column">
-              <label className="text-dark">{user?.name}</label>
-              <label className="text-secondary"> {user?.email}</label>
+              <label className="text-dark mb-0">{user?.name}</label>
+              <label className="text-secondary">{user?.email}</label>
             </div>
           </div>
-        </div>
-        <div
-          className="dashboardCounts p-3 rounded d-flex justify-content-between align-items-center"
-          style={{ background: "#F7F7F7" }}
-        >
+        </Col>
+      </Row>
+
+      {/* Summary Cards */}
+      <Row
+        className="dashboardCounts p-3 rounded mb-3 g-3"
+        style={{ background: "#F7F7F7" }}
+      >
+        <Col xs={12} md={6} lg={3}>
           <div
-            className="dashboardCounts text-white p-2 rounded"
+            className="dashboardCounts text-white p-3 rounded"
             style={{
               border: "1px solid #ccc",
               background:
@@ -138,43 +184,44 @@ export const Dashboard = () => {
             }}
           >
             <div>
-              <FaScaleBalanced />
-              Total Balance
+              <FaScaleBalanced /> Total Balance
             </div>
             <div className="text-start fw-bold fs-1">${balance}</div>
             <label style={{ fontSize: "12px", color: "#FADA5E" }}>
-              Balance Last Month: ${previousMonthBalance}
+              Last Month: ${previousMonthBalance}
             </label>
           </div>
+        </Col>
+
+        <Col xs={12} md={6} lg={3}>
           <div
-            className="dashboardCounts bg-white p-2 rounded"
+            className="dashboardCounts bg-white p-3 rounded"
             style={{ border: "1px solid #ccc", color: "grey" }}
           >
             <div>
-              <AiOutlineTransaction />
-              Total Transactions
+              <AiOutlineTransaction /> Total Transactions
             </div>
-
             <div
               className="text-start fw-bold fs-1"
               style={{ color: "#00573F" }}
             >
-              {transactions.length}
+              {displayTransactions?.length}
             </div>
             <label style={{ fontSize: "12px", color: "#228B22" }}>
-              {comparisonDateLength > 0
-                ? `${comparisonDateLength + 1} increased from last month`
-                : `${comparisonDateLength + 1} decreased from last month`}
+              {compareTranLength >= 0
+                ? `${compareTranLength} ↑ from last month`
+                : `${Math.abs(compareTranLength)} ↓ from last month`}
             </label>
           </div>
+        </Col>
 
+        <Col xs={12} md={6} lg={3}>
           <div
-            className="dashboardCounts bg-white p-2 rounded"
+            className="dashboardCounts bg-white p-3 rounded"
             style={{ border: "1px solid #ccc", color: "grey" }}
           >
             <div>
-              <AiFillDollarCircle />
-              Total Income
+              <AiFillDollarCircle /> Total Income
             </div>
             <div
               className="text-start fw-bold fs-1"
@@ -183,17 +230,19 @@ export const Dashboard = () => {
               ${income}
             </div>
             <label style={{ color: "#00AB66" }}>
-              <IoMdTrendingUp />
-              {((income / totalBudget) * 100).toFixed(2)}%
+              <IoMdTrendingUp />{" "}
+              {((income / totalBudget) * 100 || 0).toFixed(2)}%
             </label>
           </div>
+        </Col>
+
+        <Col xs={12} md={6} lg={3}>
           <div
-            className="dashboardCounts bg-white p-2 rounded"
+            className="dashboardCounts bg-white p-3 rounded"
             style={{ border: "1px solid #ccc", color: "grey" }}
           >
             <div>
-              <AiFillDollarCircle />
-              Total Expense
+              <AiFillDollarCircle /> Total Expense
             </div>
             <div
               className="text-start fw-bold fs-1"
@@ -201,34 +250,26 @@ export const Dashboard = () => {
             >
               ${expense}
             </div>
-            <div>
-              <label style={{ color: "#e41c38" }}>
-                {" "}
-                <IoMdTrendingDown />
-                {((expense / totalBudget) * 100).toFixed(2)}%
-              </label>
-            </div>
+            <label style={{ color: "#e41c38" }}>
+              <IoMdTrendingDown />{" "}
+              {((expense / totalBudget) * 100 || 0).toFixed(2)}%
+            </label>
           </div>
-        </div>
-        <div
-          className=" dashboardCounts p-5 rounded"
-          style={{ background: "#F7F7F7" }}
-        >
-          <ResponsiveContainer width={"100%"} height={300}>
-            <BarChart
-              data={data}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
+        </Col>
+      </Row>
+      {/* Bar Chart */}
+      <Row
+        className="dashboardCounts p-3 rounded mb-3"
+        style={{ background: "#F7F7F7" }}
+      >
+        <Col xs={12}>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="tranDate" />
               <YAxis />
-              <Legend />
               <Tooltip />
+              <Legend />
               <Bar
                 dataKey="income"
                 fill="#B3CDAD"
@@ -241,23 +282,17 @@ export const Dashboard = () => {
               />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-        <div
-          className="dashboardCounts p-5 rounded"
-          style={{ background: "#F7F7F7" }}
-        >
-          <ResponsiveContainer width={"100%"} height={300}>
-            <AreaChart
-              width={500}
-              height={400}
-              data={data}
-              margin={{
-                top: 10,
-                right: 30,
-                left: 0,
-                bottom: 0,
-              }}
-            >
+        </Col>
+      </Row>
+
+      {/* Area Chart */}
+      <Row
+        className="dashboardCounts p-3 rounded mb-3"
+        style={{ background: "#F7F7F7" }}
+      >
+        <Col xs={12}>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="tranDate" />
               <YAxis />
@@ -277,73 +312,49 @@ export const Dashboard = () => {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-        <div
-          className=" mt-3 rounded d-flex justify-content-between"
-          style={{
-            boxSizing: "border-box",
-            overflow: "hidden",
-            maxWidth: "100%",
-            background: "#F7F7F7",
-          }}
-        >
-          <div className="dashboardCounts bg-white rounded p-2">
-            <ResponsiveContainer width={"100%"} height={300}>
-              <LineChart
-                width={500}
-                height={300}
-                data={data}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="tranDate" padding={{ left: 20, right: 20 }} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#177245"
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        </Col>
+      </Row>
 
-          <div className=" dashboardCounts bg-white rounded p-2">
-            <ResponsiveContainer width={"100%"} height={300}>
-              <LineChart
-                width={500}
-                height={300}
-                data={data}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="tranDate" padding={{ left: 20, right: 20 }} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="expense"
-                  stroke="#ED2939"
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </Container>
-    </>
+      {/* Two Line Charts */}
+      <Row
+        className="dashboardCounts p-3 rounded mb-3 g-3"
+        style={{ background: "#F7F7F7" }}
+      >
+        <Col xs={12} md={6}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="tranDate" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="income"
+                stroke="#177245"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Col>
+        <Col xs={12} md={6}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="tranDate" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="expense"
+                stroke="#ED2939"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Col>
+      </Row>
+    </Container>
   );
 };

@@ -7,8 +7,8 @@ body,
 
 .wrapper {
   min-height: 100vh;
-  background: black;
-  color: #e4e3e3f0;
+  /* background: black;
+  color: #e4e3e3f0; */
   display: flex;
   flex-direction: column;
 }
@@ -31,8 +31,51 @@ body,
   border-right: 1px solid #eee;
   overflow-y: auto;
   /* position: fixed; */
+  transition: transform 0.3s ease;
+  z-index: 1040;
 }
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+  }
 
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .white-space-nowrap {
+    white-space: nowrap;
+  }
+  .main-content,
+  .main {
+    margin-left: 0;
+  }
+
+  .toggle-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: #198754;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    z-index: 1050;
+    border-radius: 4px;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1030;
+  }
+}
 .brand {
   font-size: 1.5rem;
   font-weight: bold;
@@ -152,13 +195,104 @@ body,
   color: #00573f;
   animation: spin 1s linear infinite;
 }
+.image-container {
+  height: 100%;
+  min-height: 100%;
+}
 @keyframes spin {
   100% {
     transform: rotate(360deg);
   }
 }
+.loginMain {
+  display: flex;
+  flex-direction: row;
+}
+.signUpMain {
+  display: flex;
+  flex-direction: row;
+}
+/* Dashboard responsiveness */
+@media (max-width: 992px) {
+  .dashboardCounts {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .dashboardCounts > div {
+    width: 100% !important;
+  }
+
+  .topDasboardItems {
+    width: 35px;
+    height: 35px;
+  }
+}
+
 @media (max-width: 768px) {
+  .dashboardCounts {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .dashboardCounts > div {
+    flex: 1 1 100%;
+    width: 100% !important;
+  }
+
   .main-content {
-    margin-left: 0;
+    padding: 0.5rem;
+  }
+
+  .dashboardCounts .fs-1 {
+    font-size: 1.5rem !important;
+  }
+
+  .dashboardCounts .p-3,
+  .dashboardCounts .p-5 {
+    padding: 1rem !important;
+  }
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .table th,
+  .table td {
+    white-space: nowrap;
+  }
+  .topControls,
+  .topControlInputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .loginMain {
+    flex-direction: column; /* stack image above form */
+  }
+
+  .loginMain .col-md-6 {
+    width: 100%; /* make each column full width */
+    max-width: 100%;
+  }
+
+  .image-container {
+    min-height: 250px; /* ensures image shows on small screens */
+    margin-bottom: 1rem; /* add some space at the bottom */
+  }
+  .signupMain {
+    flex-direction: column;
+  }
+
+  .signupMain .col-md-6 {
+    width: 100%;
+    max-width: 100%;
+  }
+  .signUpBackground {
+    min-height: 250px; /* ensures image shows on small screens */
+  }
+  .signUpTipsAndImage {
+    margin-bottom: 1rem;
   }
 }

@@ -15,7 +15,6 @@ export const TransactionForm = () => {
     transactionById,
     editState,
     setEditState,
-    createPendingState,
   } = useUser();
   const [transactionId, setTransactionId] = useState(null);
   useEffect(() => {
@@ -74,37 +73,61 @@ export const TransactionForm = () => {
   ];
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    if (editState) {
-      const pendingResponse = updateTransaction({ transactionId, form });
-      createPendingState(pendingResponse);
-      const { status, message } = await pendingResponse;
-      toast[status](message);
+    const { title, amount, tranDate, type } = form;
+    const emptyFieldToastId = "empty-fields";
+    if (!title || !amount || !tranDate || !type) {
+      if (!toast.isActive(emptyFieldToastId)) {
+        return toast.error("Please fill in all fields", {
+          toastId: emptyFieldToastId,
+        });
+      }
+      return; // 🔴 Stop here if validation fails
+    }
+    const isEdit = editState;
+    const pendingToastId = isEdit ? "edit-pending" : "add-pending";
+    const resultToastIdPrefix = isEdit ? "edit-result" : "add-result";
+
+    const apiCall = isEdit
+      ? updateTransaction({ transactionId, form })
+      : postTransaction(form);
+
+    // ✅ Prevent duplicate pending toast
+    if (!toast.isActive(pendingToastId)) {
+      toast.promise(
+        apiCall,
+        {
+          pending: "Please wait...",
+        },
+        {
+          toastId: pendingToastId,
+        }
+      );
+    }
+
+    const { status, message } = await apiCall;
+
+    const resultToastId = `${resultToastIdPrefix}-${status}-${message}`;
+
+    // ✅ Prevent duplicate result toast
+    if (!toast.isActive(resultToastId)) {
       if (status === "success") {
-        setEditState(false);
+        toast.success(message, { toastId: resultToastId });
+
+        if (isEdit) {
+          setEditState(false);
+        }
+
         setForm(initialState);
-        // Reset form on success
         getAllTransactions();
-        //close modal
         toggleModal(false);
       } else {
-        toast.error("Failed to update transaction. Please try again.");
+        toast.error(message || "Something went wrong. Please Try again", {
+          toastId: resultToastId,
+        });
       }
-      return;
-    }
-    const pendingResponse = postTransaction(form);
-    createPendingState(pendingResponse);
-    const { status, message } = await pendingResponse;
-    toast[status](message);
-    if (status === "success") {
-      setForm(initialState);
-      // Reset form on success
-      getAllTransactions();
-      //close modal
-      toggleModal(false);
-    } else {
-      toast.error("Failed to add transaction. Please try again.");
     }
   };
+
   return (
     <div className="border rounded p-4">
       {editState ? (

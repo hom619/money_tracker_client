@@ -11,11 +11,6 @@ export const UserProvider = ({ children }) => {
     status === "success" && setTransactions(transactions);
   };
   const [transactionById, setTransactionById] = useState([]);
-  const createPendingState = (pendingResponse) => {
-    toast.promise(pendingResponse, {
-      pending: "Please wait...",
-    });
-  };
   const [show, setShow] = useState(false);
   const [chartData, setChartData] = useState([]);
   const toggleModal = (value) => setShow(value);
@@ -32,7 +27,6 @@ export const UserProvider = ({ children }) => {
         setEditState,
         editState,
         show,
-        createPendingState,
         chartData,
         setChartData,
       }}

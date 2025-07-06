@@ -9,13 +9,13 @@ export const Signup = () => {
   return (
     <Container className="p-5">
       <Row
-        className="p-5 rounded"
+        className="signUpMain p-5 rounded"
         style={{
           backgroundColor: "#01c68e08",
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <Col md={6}>
+        <Col md={6} className="signUpTipsAndImage">
           <FinancialTips />
         </Col>
         <Col md={6}>

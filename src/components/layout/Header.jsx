@@ -9,144 +9,70 @@ import { IoCreate } from "react-icons/io5";
 import { BiSolidDashboard } from "react-icons/bi";
 import { TbTransactionDollar } from "react-icons/tb";
 import { useUser } from "../../context/UserContext";
+import { GiMoneyStack } from "react-icons/gi";
 
 export const Header = () => {
   const { user, setUser } = useUser();
-  //const [expandMenu, setExpandMenu] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleSidebar = () => setIsOpen(!isOpen);
   const handleOnLogOut = () => {
     //remove the access token from the local storage
     localStorage.removeItem("accessJWT");
     setUser({});
     //redirect to the login page
-    //setExpandMenu(false);
   };
   return (
-    // <div className="sidebar d-flex flex-column p-3">
-    //   <h2 className="brand">🟢 Donezo</h2>
-
-    //   <hr />
-
-    //   <Nav className="flex-column">
-    //     <Nav.Link href="#" className="nav-item active">
-    //       <BiSolidDashboard />
-    //       Dashboard
-    //     </Nav.Link>
-    //     <Nav.Link to="/transactions" onClick={() => setExpandMenu(false)}>
-    //       <TbTransactionDollar /> Transactions
-    //     </Nav.Link>
-    //     <Nav.Link href="#">Calendar</Nav.Link>
-    //     <Nav.Link href="#">Analytics</Nav.Link>
-    //     <Nav.Link href="#">Team</Nav.Link>
-    //   </Nav>
-
-    //   <hr />
-
-    //   <Nav className="flex-column">
-    //     <Nav.Link href="#">Settings</Nav.Link>
-    //     <Nav.Link href="#">Help</Nav.Link>
-    //     <Nav.Link href="#">Logout</Nav.Link>
-    //   </Nav>
-    // </div>
     <>
       {user?._id && (
-        <div className="sidebar d-flex flex-column p-3">
-          <h2 className="brand">🟢 Donezo</h2>
-
-          <hr />
-
-          <Nav className="flex-column">
-            <NavLink
-              to="/dashboard"
-              className="nav-item"
-              activeclassname="active"
+        <>
+          <button className="toggle-btn d-md-none" onClick={toggleSidebar}>
+            ☰
+          </button>
+          <div
+            className={`sidebar ${isOpen ? "open" : ""} d-flex flex-column p-3`}
+          >
+            <h2
+              className="brand"
+              style={{ fontFamily: "Barriecito", fontSize: "2rem" }}
             >
-              <BiSolidDashboard />
-              Dashboard
-            </NavLink>
-            <NavLink
-              to="/transactions"
-              className="nav-item"
-              activeclassname="active"
-              onClick={() => setExpandMenu(false)}
-            >
-              <TbTransactionDollar /> Transactions
-            </NavLink>
-            <NavLink
-              to="/"
-              className="nav-item"
-              activeclassname="active"
-              onClick={handleOnLogOut}
-            >
-              <ImExit /> Logout
-            </NavLink>
-          </Nav>
-        </div>
+              <GiMoneyStack /> Tracker
+            </h2>
+            <hr />
+            <Nav className="flex-column">
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `nav-item ${isActive ? "active" : ""}`
+                }
+                onClick={toggleSidebar}
+              >
+                <BiSolidDashboard /> Dashboard
+              </NavLink>
+              <NavLink
+                to="/transactions"
+                className={({ isActive }) =>
+                  `nav-item ${isActive ? "active" : ""}`
+                }
+                onClick={toggleSidebar}
+              >
+                <TbTransactionDollar /> Transactions
+              </NavLink>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `nav-item ${isActive ? "active" : ""}`
+                }
+                onClick={handleOnLogOut}
+              >
+                <ImExit /> Logout
+              </NavLink>
+            </Nav>
+          </div>
+          {isOpen && (
+            <div className="overlay d-md-none" onClick={toggleSidebar}></div>
+          )}
+        </>
       )}
     </>
-    // <Navbar
-    //   expand="lg"
-    //   variant="dark"
-    //   className="bg-body-dark"
-    //   expanded={expandMenu}
-    // >
-    //   <Container>
-    //     <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-    //     <Navbar.Toggle
-    //       aria-controls="basic-navbar-nav"
-    //       onClick={() => setExpandMenu(true)}
-    //     />
-    //     <Navbar.Collapse id="basic-navbar-nav">
-    //       <Nav className="ms-auto">
-    //         {user?._id ? (
-    //           <>
-    //             <Link
-    //               className="nav-link"
-    //               to="/dashboard"
-    //               onClick={() => setExpandMenu(false)}
-    //             >
-    //               <BiSolidDashboard />
-    //               Dashboard
-    //             </Link>
-    //             <Link
-    //               className="nav-link"
-    //               to="/transactions"
-    //               onClick={() => setExpandMenu(false)}
-    //             >
-    //               <TbTransactionDollar />
-    //               Transactions
-    //             </Link>
-
-    //             <Link
-    //               onClick={handleOnLogOut}
-    //               className="nav-link"
-    //               to="/signup"
-    //             >
-    //               <ImExit />
-    //               Logout
-    //             </Link>
-    //           </>
-    //         ) : (
-    //           <>
-    //             <Link
-    //               className="nav-link"
-    //               to="/"
-    //               onClick={() => setExpandMenu(false)}
-    //             >
-    //               <TbLogin /> Login
-    //             </Link>
-    //             <Link
-    //               className="nav-link"
-    //               to="/signup"
-    //               onClick={() => setExpandMenu(false)}
-    //             >
-    //               <IoCreate />
-    //               Sign up
-    //             </Link>
-    //           </>
-    //         )}
-    //       </Nav>
-    //     </Navbar.Collapse>
-    //   </Container>
-    // </Navbar>
   );
 };

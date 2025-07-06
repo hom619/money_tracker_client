@@ -23,7 +23,7 @@ export const Login = () => {
   return (
     <Container className="p-5">
       <Row
-        className="border p-5 rounded"
+        className="loginMain border p-5 rounded"
         style={{
           backgroundColor: "#01c68e08",
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
@@ -31,7 +31,7 @@ export const Login = () => {
       >
         <Col md={6}>
           <div
-            className="border rounded d-flex flex-column justify-content-center"
+            className="image-container border rounded"
             style={{
               backgroundImage: `url(${images[currentIndex]})`,
               height: "100%",

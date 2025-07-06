@@ -11,7 +11,7 @@ import { FaEnvelope, FaLock } from "react-icons/fa";
 
 export const SignInForm = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useUser();
+  const { user, setUser, createPendingState } = useUser();
   const initialState = {
     email: "",
     password: "",
