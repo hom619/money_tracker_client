@@ -1,0 +1,22 @@
+[33m65e6832[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m0df5281[m HEAD@{1}: reset: moving to HEAD~
+[33m8766774[m HEAD@{2}: commit: added vercel file to avoid 404 issues
+[33m0df5281[m HEAD@{3}: commit: Made UI mobile responsive and added month picker to charts as per the months
+[33m65e6832[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{4}: commit: UI modification in added spinner while loading the transaction data
+[33m8090440[m HEAD@{5}: commit: Bug fixes and UI customization
+[33mf2a8aff[m HEAD@{6}: commit: Api integration for delete by each transaction
+[33m70227fc[m HEAD@{7}: commit: api integration with front end for updating transactions
+[33mdd558e7[m HEAD@{8}: commit: Delete transaction api integration completed
+[33mbfaf07a[m HEAD@{9}: commit: Added delete checkboxes in transaction table
+[33mf588328[m HEAD@{10}: commit: Added custom pop up modal for the transaction form
+[33m76c3254[m HEAD@{11}: commit: Displaying data in transaction table fetched from api
+[33m8f86c25[m HEAD@{12}: commit: Adding new transaction API integration to front end
+[33m8709ce7[m HEAD@{13}: commit: New transaction form add
+[33m3464cb5[m HEAD@{14}: commit: Logout feature added and auto login feature created
+[33m7663378[m HEAD@{15}: commit: Global state management create to save the data of logged in user for authorization
+[33m743488e[m HEAD@{16}: commit: Routing page for dashboard and transaction is created
+[33m75e60a3[m HEAD@{17}: commit: Created custom hooks to handle form state and changes
+[33ma644ba0[m HEAD@{18}: commit: Created sign in page and added layout of the main page
+[33me8f8058[m HEAD@{19}: commit: User sign up front end connected with server
+[33m28d1d6c[m HEAD@{20}: commit: Signup page created
+[33m184341a[m HEAD@{21}: commit (initial): Project setup done and all the packages installed
